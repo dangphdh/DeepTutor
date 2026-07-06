@@ -73,6 +73,17 @@ DEFAULT_UI_SETTINGS = {
     # connection timed out. Bumped from 60 → 180 so slow tools (image/video
     # generation) don't trip it; user-adjustable in Settings > Network.
     "chat_response_timeout": 180,
+    # When true, the chat system prompt gets a Kid Mode block that reshapes
+    # the tutor's voice for a young child (short sentences, warm encouragement,
+    # simple words, one idea at a time). Per-user UI preference; the mastery
+    # bar is unaffected — only the voice changes.
+    "kid_mode": False,
+    # When true, the tutor gives Socratic hints instead of the answer. A
+    # deterministic hint budget is enforced in deep_solve (SolveSession) and
+    # mastery_path (PendingQuestion); after max_hints wrong attempts the full
+    # answer is revealed. In plain chat it is a strong prompt directive only.
+    "hint_mode": False,
+    "max_hints": 3,
 }
 
 # Bounds for the chat idle timeout (seconds): long enough for video renders,
@@ -88,7 +99,10 @@ class SidebarNavOrder(BaseModel):
 
 class UISettings(BaseModel):
     theme: Literal["light", "dark", "glass", "snow"] = "snow"
-    language: Literal["zh", "en"] = "en"
+    language: Literal["zh", "en", "vi"] = "en"
+    kid_mode: bool = False
+    hint_mode: bool = False
+    max_hints: int = Field(default=3, ge=1, le=10)
     sidebar_description: Optional[str] = None
     sidebar_nav_order: Optional[SidebarNavOrder] = None
 
@@ -106,7 +120,16 @@ class ThemeUpdate(BaseModel):
 
 
 class LanguageUpdate(BaseModel):
-    language: Literal["zh", "en"]
+    language: Literal["zh", "en", "vi"]
+
+
+class KidModeUpdate(BaseModel):
+    kid_mode: bool
+
+
+class HintModeUpdate(BaseModel):
+    hint_mode: bool
+    max_hints: int = Field(default=3, ge=1, le=10)
 
 
 class SidebarDescriptionUpdate(BaseModel):
@@ -910,6 +933,37 @@ async def update_language(update: LanguageUpdate):
     current_ui["language"] = update.language
     save_ui_settings(current_ui)
     return {"language": update.language}
+
+
+@router.put("/kid-mode")
+async def update_kid_mode(update: KidModeUpdate):
+    """Persist the Kid Mode toggle.
+
+    When on, the chat system prompt gets an extra block that reshapes the
+    tutor's voice for a young child. Per-user UI preference; the mastery
+    bar is unaffected — only the voice changes.
+    """
+    current_ui = load_ui_settings()
+    current_ui["kid_mode"] = bool(update.kid_mode)
+    save_ui_settings(current_ui)
+    return {"kid_mode": bool(update.kid_mode)}
+
+
+@router.put("/hint-mode")
+async def update_hint_mode(update: HintModeUpdate):
+    """Persist the Hint Mode toggle and max-hints budget.
+
+    When on, the tutor gives Socratic hints instead of the answer. A
+    deterministic hint budget (``max_hints``) is enforced in deep_solve
+    (SolveSession) and mastery_path (PendingQuestion); after that many
+    wrong attempts the full answer is revealed. In plain chat it is a
+    strong prompt directive only.
+    """
+    current_ui = load_ui_settings()
+    current_ui["hint_mode"] = bool(update.hint_mode)
+    current_ui["max_hints"] = int(update.max_hints)
+    save_ui_settings(current_ui)
+    return {"hint_mode": bool(update.hint_mode), "max_hints": int(update.max_hints)}
 
 
 @router.put("/voice-autoplay")

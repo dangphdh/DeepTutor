@@ -79,6 +79,15 @@ class UnifiedContext:
     language: str = "en"
     memory_context: str = ""
     persona_context: str = ""
+    # When True, the chat system prompt gets a Kid Mode block that reshapes
+    # the tutor's voice for a young child (short sentences, warm encouragement,
+    # simple words, one idea at a time). The mastery bar is unaffected.
+    kid_mode: bool = False
+    # When True, the tutor gives Socratic hints instead of the answer. A
+    # deterministic hint budget (max_hints) is enforced in deep_solve and
+    # mastery_path; in plain chat it is a strong prompt directive only.
+    hint_mode: bool = False
+    max_hints: int = 3
     skills_manifest: str = ""
     source_manifest: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)

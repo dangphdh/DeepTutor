@@ -12,7 +12,17 @@ import {
 
 export default function AppearanceSettingsPage() {
   const { t } = useTranslation();
-  const { theme, language, updateTheme, updateLanguage } = useSettings();
+  const {
+    theme,
+    language,
+    kidMode,
+    hintMode,
+    maxHints,
+    updateTheme,
+    updateLanguage,
+    updateKidMode,
+    updateHintMode,
+  } = useSettings();
 
   return (
     <div data-tour="tour-appearance">
@@ -34,7 +44,7 @@ export default function AppearanceSettingsPage() {
           )}
           control={
             <div className="flex gap-0.5 rounded-lg bg-[var(--muted)] p-0.5">
-              {(["en", "zh"] as const).map((v) => (
+              {(["en", "zh", "vi"] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => updateLanguage(v)}
@@ -44,10 +54,102 @@ export default function AppearanceSettingsPage() {
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   }`}
                 >
-                  {v === "en" ? t("language.english") : t("language.chinese")}
+                  {v === "en"
+                    ? t("language.english")
+                    : v === "zh"
+                      ? t("language.chinese")
+                      : t("language.vietnamese")}
                 </button>
               ))}
             </div>
+          }
+        />
+      </SettingSection>
+
+      <SettingSection
+        title={t("Kid Mode")}
+        description={t(
+          "Kid Mode adapts the tutor's voice for a young child: short sentences, warm encouragement, simple words, and one idea at a time. The mastery bar stays the same — only the voice changes.",
+        )}
+      >
+        <SettingRow
+          title={t("Kid Mode")}
+          description={t(
+            "When on, the tutor speaks to a young child in a warm, simple voice across every capability (chat, mastery, deep solve).",
+          )}
+          control={
+            <button
+              type="button"
+              role="switch"
+              aria-checked={kidMode}
+              onClick={() => updateKidMode(!kidMode)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
+                kidMode
+                  ? "bg-[var(--primary)]"
+                  : "bg-[var(--muted)]"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  kidMode ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          }
+        />
+      </SettingSection>
+
+      <SettingSection
+        title={t("Hint Mode")}
+        description={t(
+          "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.",
+        )}
+      >
+        <SettingRow
+          title={t("Hint Mode")}
+          description={t(
+            "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.",
+          )}
+          control={
+            <button
+              type="button"
+              role="switch"
+              aria-checked={hintMode}
+              onClick={() => updateHintMode(!hintMode)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
+                hintMode ? "bg-[var(--primary)]" : "bg-[var(--muted)]"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  hintMode ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          }
+        />
+        <SettingRow
+          title={t("Max hints before revealing the answer")}
+          description={t(
+            "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.",
+          )}
+          control={
+            <input
+              type="number"
+              min={1}
+              max={10}
+              value={maxHints}
+              disabled={!hintMode}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                if (Number.isFinite(v) && v >= 1 && v <= 10) {
+                  updateHintMode(hintMode, Math.round(v));
+                }
+              }}
+              className={`w-20 rounded-md border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-[13px] text-[var(--foreground)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
+                !hintMode ? "cursor-not-allowed opacity-50" : ""
+              }`}
+            />
           }
         />
       </SettingSection>

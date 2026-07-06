@@ -32,7 +32,7 @@ type BuiltinTool = {
   name: string;
   description: string;
   parameters: ToolParameter[];
-  hints: { en: ToolHints; zh: ToolHints };
+  hints: { en: ToolHints; zh: ToolHints; vi?: ToolHints };
   aliases: string[];
   toggleable: boolean;
   enabled: boolean;
@@ -255,7 +255,7 @@ export default function ToolsSettingsPage() {
                 <div className="overflow-hidden rounded-xl border border-[var(--border)]/60 bg-[var(--card)]/40">
                   {list.map((tool, idx) => {
                     const isOpen = expanded.has(tool.name);
-                    const hints = tool.hints[language];
+                    const hints = tool.hints[language] ?? tool.hints.en;
                     const isPending = pending.has(tool.name);
                     const isComingSoon = !!tool.coming_soon;
                     const isEnabled =

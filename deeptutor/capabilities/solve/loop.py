@@ -13,7 +13,7 @@ from importlib import resources
 from typing import Any
 
 from deeptutor.capabilities.protocol import PromptBlock
-from deeptutor.capabilities.solve.session import DEFAULT_MAX_REPLANS, get_session
+from deeptutor.capabilities.solve.session import DEFAULT_MAX_HINTS, DEFAULT_MAX_REPLANS, get_session
 from deeptutor.capabilities.solve.tools import SOLVE_TOOL_NAMES
 from deeptutor.core.context import UnifiedContext
 
@@ -63,8 +63,20 @@ class SolveLoopCapability:
                 )
             except (TypeError, ValueError):
                 session.max_replans = DEFAULT_MAX_REPLANS
+            # Seed the hint budget from the per-user Hint Mode toggle. Only
+            # meaningful when context.hint_mode is on; the solve_finish_step
+            # gate checks hint_mode + budget together.
+            if getattr(context, "hint_mode", False):
+                try:
+                    session.max_hints = max(1, int(getattr(context, "max_hints", DEFAULT_MAX_HINTS)))
+                except (TypeError, ValueError):
+                    session.max_hints = DEFAULT_MAX_HINTS
             updated = dict(kwargs)
             updated["_solve_session_id"] = session_id
+            # Surface hint-mode state so solve_finish_step can gate its
+            # "write the final answer" instruction without re-reading context.
+            updated["_hint_mode"] = bool(getattr(context, "hint_mode", False))
+            updated["_max_hints"] = session.max_hints
             return updated
         return kwargs
 
@@ -83,9 +95,20 @@ def _prompt_text(prompts: dict[str, Any], path: tuple[str, ...]) -> str:
 
 
 def _load_system_prompt(language: str) -> str:
-    lang = "zh" if language.lower().startswith("zh") else "en"
+    raw = (language or "en").lower().strip()
+    if raw.startswith("zh"):
+        lang = "zh"
+    elif raw.startswith("vi"):
+        lang = "vi"
+    else:
+        lang = "en"
     prompt = resources.files(__package__).joinpath("prompts", lang, "system.md")
-    return prompt.read_text(encoding="utf-8").strip()
+    try:
+        return prompt.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        # Missing translation file — fall back to English rather than crash.
+        prompt = resources.files(__package__).joinpath("prompts", "en", "system.md")
+        return prompt.read_text(encoding="utf-8").strip()
 
 
 __all__ = ["SolveLoopCapability"]

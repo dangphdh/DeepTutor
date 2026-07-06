@@ -16,6 +16,14 @@ DEFAULT_UI_SETTINGS: dict[str, Any] = {
     # "snow" is the pure-white neutral theme, shown as "Default" in the UI.
     "theme": "snow",
     "language": "en",
+    # Mirror of the API-layer default; True reshapes the tutor's voice for
+    # a young child via a Kid Mode system-prompt block.
+    "kid_mode": False,
+    # When true, the tutor gives Socratic hints instead of the answer, with a
+    # deterministic budget gate in deep_solve and mastery_path. After max_hints
+    # wrong attempts the full answer is revealed.
+    "hint_mode": False,
+    "max_hints": 3,
 }
 
 
@@ -31,6 +39,7 @@ def _normalize_language(language: Any, default: str = "en") -> str:
     Normalize language codes:
     - en/english -> en
     - zh/chinese/cn -> zh
+    - vi/vietnamese -> vi
     """
     if language is None or language == "":
         language = default
@@ -41,6 +50,8 @@ def _normalize_language(language: Any, default: str = "en") -> str:
             return "en"
         if s in {"zh", "chinese", "cn"}:
             return "zh"
+        if s in {"vi", "vietnamese", "tiếng việt", "tieng viet"}:
+            return "vi"
 
     # Fall back to default
     if isinstance(default, str):

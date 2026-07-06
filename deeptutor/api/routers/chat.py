@@ -76,6 +76,8 @@ async def websocket_chat(websocket: WebSocket):
                 if requested_language.startswith("zh")
                 else "en"
                 if requested_language.startswith("en")
+                else "vi"
+                if requested_language.startswith("vi")
                 else get_ui_language(default=config.get("system", {}).get("language", "en"))
             )
             message = data.get("message", "").strip()

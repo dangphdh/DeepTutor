@@ -47,6 +47,10 @@ class MasteryLoopCapability:
             updated["_mastery_path_id"] = str(context.metadata.get("mastery_path_id") or "").strip()
             updated["_session_id"] = str(context.session_id or "").strip()
             updated["_turn_id"] = str(context.metadata.get("turn_id") or "").strip()
+            # Surface Hint Mode state so mastery_grade can gate its feedback
+            # without re-reading context (mirrors solve loop's _hint_mode).
+            updated["_hint_mode"] = bool(getattr(context, "hint_mode", False))
+            updated["_max_hints"] = int(getattr(context, "max_hints", 3) or 3)
             return updated
         return kwargs
 
@@ -65,9 +69,20 @@ def _prompt_text(prompts: dict[str, Any], path: tuple[str, ...]) -> str:
 
 
 def _load_system_prompt(language: str) -> str:
-    lang = "zh" if language.lower().startswith("zh") else "en"
+    raw = (language or "en").lower().strip()
+    if raw.startswith("zh"):
+        lang = "zh"
+    elif raw.startswith("vi"):
+        lang = "vi"
+    else:
+        lang = "en"
     prompt = resources.files(__package__).joinpath("prompts", lang, "system.md")
-    return prompt.read_text(encoding="utf-8").strip()
+    try:
+        return prompt.read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        # Missing translation file — fall back to English rather than crash.
+        prompt = resources.files(__package__).joinpath("prompts", "en", "system.md")
+        return prompt.read_text(encoding="utf-8").strip()
 
 
 __all__ = ["MasteryLoopCapability"]

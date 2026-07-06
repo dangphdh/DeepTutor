@@ -787,9 +787,14 @@ export function ServiceConfigEditor({ service }: { service: ServiceName }) {
   );
 }
 
-function defaultModelLabel(language: "en" | "zh", index: number): string {
+function defaultModelLabel(
+  language: "en" | "zh" | "vi",
+  index: number,
+): string {
   const safeIndex = index > 0 ? index : 1;
-  return language === "zh" ? `模型${safeIndex}` : `Model ${safeIndex}`;
+  if (language === "zh") return `模型${safeIndex}`;
+  if (language === "vi") return `Mô hình ${safeIndex}`;
+  return `Model ${safeIndex}`;
 }
 
 function formatCompactTokens(value: string | number | undefined): string {

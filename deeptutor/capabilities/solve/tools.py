@@ -182,16 +182,61 @@ class SolveFinishStepTool(BaseTool):
                 success=False,
             )
         nxt = session.next_step()
+        # Hint Mode gate: when all steps are done but Hint Mode is on and the
+        # hint budget is not exhausted, withthold the final answer. The model
+        # must give a Socratic hint and call solve_finish_step again — bumping
+        # the counter each round, exactly how solve_replan's budget works.
+        hint_mode = bool(kwargs.get("_hint_mode"))
+        hint_instruction = ""
+        hint_meta: dict[str, Any] = {}
+        if nxt is None and hint_mode:
+            if session.give_hint():
+                hint_instruction = (
+                    f"ALL STEPS DONE, but Hint Mode is ON and the hint budget "
+                    f"is NOT exhausted ({session.hints_given} of "
+                    f"{session.max_hints} given). DO NOT write the final "
+                    f"answer yet. Give hint #{session.hints_given} — a "
+                    f"Socratic nudge that points the learner toward the "
+                    f"result without revealing it — then call "
+                    f"solve_finish_step AGAIN with the same step_id and an "
+                    f"empty summary. Only when the budget is exhausted may "
+                    f"you write the final answer."
+                )
+                hint_meta = {
+                    "hint": {
+                        "n": session.hints_given,
+                        "max": session.max_hints,
+                        "exhausted": False,
+                    }
+                }
+            else:
+                hint_instruction = (
+                    f"Hint budget exhausted ({session.max_hints} of "
+                    f"{session.max_hints} given). Reveal the full answer now, "
+                    f"step by step, as planned."
+                )
+                hint_meta = {
+                    "hint": {
+                        "n": session.hints_given,
+                        "max": session.max_hints,
+                        "exhausted": True,
+                    }
+                }
         payload = {
             "status": "step_done",
             "completed": step_id,
             "next": nxt.to_dict() if nxt else None,
             "all_done": session.all_done(),
             "instruction": (
-                "Write the final answer now."
-                if nxt is None
-                else "Work the next step, then call solve_finish_step again."
+                hint_instruction
+                if hint_instruction
+                else (
+                    "Write the final answer now."
+                    if nxt is None
+                    else "Work the next step, then call solve_finish_step again."
+                )
             ),
+            **hint_meta,
         }
         # The checkpoint summary persists this step's outcome while the loop
         # folds its intermediate tool messages away (see AgentLoop).

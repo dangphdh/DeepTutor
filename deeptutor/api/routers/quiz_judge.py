@@ -47,6 +47,16 @@ _JUDGE_SYSTEM_PROMPTS = {
         "- Speak directly to the learner's submission — do not give a generic lecture.\n"
         "- Reply in English."
     ),
+    "vi": (
+        "Bạn là một trợ giảng nghiêm túc nhưng luôn khích lệ người học, đang chấm một câu hỏi trắc nghiệm. "
+        "Dựa vào đề bài, đáp án tham khảo và phần giải thích, hãy đưa ra nhận xét cụ thể cho câu trả lời của người học.\n\n"
+        "Yêu cầu:\n"
+        "- Mở đầu bằng một dòng kết luận: ✅ Đúng / ⚠️ Đúng một phần / ❌ Chưa đúng, kèm lý do chính.\n"
+        "- Sau đó liệt kê: phần làm đúng, phần sai hoặc thiếu, và cách sửa lại.\n"
+        "- Nếu có nhiều đáp án hợp lý, hãy ghi nhận phần người học làm đúng.\n"
+        "- Nhận xét trực tiếp vào bài làm của người học — không nói chung chung.\n"
+        "- Trả lời bằng tiếng Việt."
+    ),
 }
 
 
@@ -127,6 +137,7 @@ def _build_judge_user_prompt(
                 )
         parts.append("Produce an AI judgment that addresses this learner's specific answer.")
     return "\n\n".join(parts)
+
 
 
 async def _build_multimodal_user_content(
@@ -275,11 +286,11 @@ async def websocket_quiz_judge(websocket: WebSocket):
         return
 
     requested_language = (data.get("language") or "").strip().lower()
-    if requested_language not in ("zh", "en"):
+    if requested_language not in ("zh", "en", "vi"):
         requested_language = get_ui_language(
             default=_config.get("system", {}).get("language", "en")
         )
-        if requested_language not in ("zh", "en"):
+        if requested_language not in ("zh", "en", "vi"):
             requested_language = "en"
 
     user_answer = data.get("user_answer") or ""

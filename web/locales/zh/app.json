@@ -1,6 +1,7 @@
 {
   "language.english": "English",
   "language.chinese": "中文",
+  "language.vietnamese": "越南语",
   "Start": "开始",
   "Learn": "学习",
   "Research": "研究",
@@ -2665,5 +2666,15 @@
   "Connected to LightRAG server": "已连接到 LightRAG 服务器",
   "Core {{version}}": "内核 {{version}}",
   "API key accepted": "API 密钥已通过",
-  "Open access": "开放访问"
+  "Open access": "开放访问",
+  "Kid Mode": "儿童模式",
+  "Kid Mode adapts the tutor's voice for a young child: short sentences, warm encouragement, simple words, and one idea at a time. The mastery bar stays the same — only the voice changes.": "儿童模式会为低龄孩子调整导师的语气：短句、温暖的鼓励、简单的用词，每次只讲一个知识点。通关标准保持不变——改变的只是语气。",
+  "When on, the tutor speaks to a young child in a warm, simple voice across every capability (chat, mastery, deep solve).": "开启后，导师会在所有能力（聊天、掌握路径、深度解题）中以温暖、简单的语气与低龄孩子对话。",
+  "Enable": "启用",
+  "Disable": "禁用",
+  "Hint Mode": "提示模式",
+  "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.": "开启后，导师会给出苏格拉底式提示而不是直接给出答案，在深度解题和掌握路径中有确定的提示预算。提示预算用完后，会展示完整答案。在普通聊天中仅为强提示指令。",
+  "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.": "引导学习者思考。适用于深度解题、掌握路径和聊天。",
+  "Max hints before revealing the answer": "揭示答案前的最大提示次数",
+  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "导师在展示完整分步答案前给出的提示次数。默认为 3。"
 }

@@ -174,16 +174,19 @@ def parse_language(language: Any) -> str:
 
     Supported language representations:
     - English: "en", "english", "English"
-    - Chinese: "zh", "chinese", "Chinese"
+    - Chinese: "zh", "chinese", "Chinese", "cn"
+    - Vietnamese: "vi", "vietnamese", "Tiếng Việt"
 
     Args:
-        language: Language configuration value (can be "zh"/"en"/"Chinese"/"English" etc.)
+        language: Language configuration value (can be "zh"/"en"/"vi"/"Chinese"/... )
 
     Returns:
-        Standardized language code: 'zh' or 'en', defaults to 'zh'
+        Standardized language code ('en', 'zh', 'vi', ...). Unknown values
+        fall back to 'en' (not 'zh') — unknown codes used to silently load
+        Chinese prompts, which was a latent footgun for any new language.
     """
     if not language:
-        return "zh"
+        return "en"
 
     if isinstance(language, str):
         lang_lower = language.lower()
@@ -191,8 +194,10 @@ def parse_language(language: Any) -> str:
             return "en"
         if lang_lower in ["zh", "chinese", "cn"]:
             return "zh"
+        if lang_lower in ["vi", "vietnamese", "tiếng việt", "tieng viet"]:
+            return "vi"
 
-    return "zh"  # Default Chinese
+    return "en"  # Default English for any unrecognized code
 
 
 def get_agent_params(module_name: str) -> dict:

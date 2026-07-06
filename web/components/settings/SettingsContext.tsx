@@ -99,7 +99,10 @@ export type Catalog = {
 
 export type UiSettings = {
   theme: "light" | "dark" | "glass" | "snow";
-  language: "en" | "zh";
+  language: "en" | "zh" | "vi";
+  kid_mode?: boolean;
+  hint_mode?: boolean;
+  max_hints?: number;
 };
 
 export type ProviderOption = {
@@ -389,12 +392,17 @@ type SettingsContextValue = {
   hasUnsavedChanges: boolean;
   theme: UiSettings["theme"];
   language: UiSettings["language"];
+  kidMode: boolean;
+  hintMode: boolean;
+  maxHints: number;
   toast: string;
   setToast: (value: string) => void;
 
   // UI prefs
   updateTheme: (next: UiSettings["theme"]) => Promise<void>;
   updateLanguage: (next: UiSettings["language"]) => Promise<void>;
+  updateKidMode: (next: boolean) => Promise<void>;
+  updateHintMode: (next: boolean, maxHints?: number) => Promise<void>;
 
   // Catalog mutation
   mutateCatalog: (mutator: (next: Catalog) => void) => void;
@@ -470,6 +478,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [theme, setTheme] = useState<UiSettings["theme"]>("snow");
   const [language, setLanguage] = useState<UiSettings["language"]>("en");
+  const [kidMode, setKidMode] = useState<boolean>(false);
+  const [hintMode, setHintMode] = useState<boolean>(false);
+  const [maxHints, setMaxHints] = useState<number>(3);
   const [catalog, setCatalog] = useState<Catalog>(defaultCatalog());
   const [draft, setDraft] = useState<Catalog>(defaultCatalog());
   const [catalogEditable, setCatalogEditable] = useState<boolean | null>(null);
@@ -553,6 +564,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       }
       setTheme(payload.ui.theme);
       setLanguage(payload.ui.language);
+      setKidMode(Boolean(payload.ui.kid_mode));
+      setHintMode(Boolean(payload.ui.hint_mode));
+      const loadedMax = Number(payload.ui.max_hints);
+      setMaxHints(Number.isFinite(loadedMax) && loadedMax >= 1 && loadedMax <= 10 ? loadedMax : 3);
       if (payload.providers) setProviders(payload.providers);
       settingsLoaded = true;
     } catch (err) {
@@ -617,11 +632,20 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     async (
       nextTheme: UiSettings["theme"],
       nextLanguage: UiSettings["language"],
+      nextKidMode: boolean,
+      nextHintMode: boolean,
+      nextMaxHints: number,
     ) => {
       await apiFetch(apiUrl("/api/v1/settings/ui"), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme: nextTheme, language: nextLanguage }),
+        body: JSON.stringify({
+          theme: nextTheme,
+          language: nextLanguage,
+          kid_mode: nextKidMode,
+          hint_mode: nextHintMode,
+          max_hints: nextMaxHints,
+        }),
       });
     },
     [],
@@ -631,18 +655,39 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     async (next: UiSettings["theme"]) => {
       setTheme(next);
       applyThemePreference(next);
-      await persistUi(next, language);
+      await persistUi(next, language, kidMode, hintMode, maxHints);
     },
-    [language, persistUi],
+    [hintMode, kidMode, language, maxHints, persistUi],
   );
 
   const updateLanguage = useCallback(
     async (next: UiSettings["language"]) => {
       setLanguage(next);
       writeStoredLanguage(next);
-      await persistUi(theme, next);
+      await persistUi(theme, next, kidMode, hintMode, maxHints);
     },
-    [persistUi, theme],
+    [hintMode, kidMode, maxHints, persistUi, theme],
+  );
+
+  const updateKidMode = useCallback(
+    async (next: boolean) => {
+      setKidMode(next);
+      await persistUi(theme, language, next, hintMode, maxHints);
+    },
+    [hintMode, language, maxHints, persistUi, theme],
+  );
+
+  const updateHintMode = useCallback(
+    async (next: boolean, nextMaxHints?: number) => {
+      const safeMax =
+        typeof nextMaxHints === "number" && nextMaxHints >= 1 && nextMaxHints <= 10
+          ? Math.round(nextMaxHints)
+          : maxHints;
+      setHintMode(next);
+      if (typeof nextMaxHints === "number") setMaxHints(safeMax);
+      await persistUi(theme, language, kidMode, next, safeMax);
+    },
+    [kidMode, language, maxHints, persistUi, theme],
   );
 
   // ── Catalog mutators ────────────────────────────────────────────────────
@@ -1165,10 +1210,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       hasUnsavedChanges,
       theme,
       language,
+      kidMode,
+      hintMode,
+      maxHints,
       toast,
       setToast,
       updateTheme,
       updateLanguage,
+      updateKidMode,
+      updateHintMode,
       mutateCatalog,
       addProfile,
       removeActiveProfile,
@@ -1213,6 +1263,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       language,
       llmContextDetection,
       logs,
+      kidMode,
+      hintMode,
+      maxHints,
       mutateCatalog,
       providers,
       registerExtension,
@@ -1234,6 +1287,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       toast,
       tourStepIndex,
       updateContextWindowField,
+      updateHintMode,
+      updateKidMode,
       updateLanguage,
       updateModelBoolField,
       updateModelField,

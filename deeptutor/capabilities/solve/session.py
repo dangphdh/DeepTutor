@@ -19,6 +19,7 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 
 DEFAULT_MAX_REPLANS = 2
+DEFAULT_MAX_HINTS = 3
 _MAX_STEPS = 12
 
 
@@ -44,6 +45,12 @@ class SolveSession:
     steps: list[SolveStep] = field(default_factory=list)
     replans: int = 0
     max_replans: int = DEFAULT_MAX_REPLANS
+    # Hint Mode budget — mirrors replans/max_replans. Bumped each time the
+    # solver finishes all steps but Hint Mode withholds the answer (the model
+    # must give a Socratic hint instead). When hints_given >= max_hints the
+    # budget is "exhausted" and the final answer may be revealed.
+    hints_given: int = 0
+    max_hints: int = DEFAULT_MAX_HINTS
 
     def set_plan(self, analysis: str, steps: list[tuple[str, str]]) -> None:
         self.analysis = analysis
@@ -56,6 +63,18 @@ class SolveSession:
             return False
         self.replans += 1
         self.set_plan(analysis, steps)
+        return True
+
+    def hint_budget_exhausted(self) -> bool:
+        """True when no more hints may be given — the answer may be revealed."""
+        return self.hints_given >= self.max_hints
+
+    def give_hint(self) -> bool:
+        """Bump the hint counter. Returns ``False`` (and leaves the counter
+        untouched) once the budget is spent — mirrors ``replan()``."""
+        if self.hint_budget_exhausted():
+            return False
+        self.hints_given += 1
         return True
 
     def mark_done(self, step_id: str, summary: str) -> SolveStep | None:
@@ -94,6 +113,7 @@ def get_session(session_id: str) -> SolveSession:
 
 __all__ = [
     "DEFAULT_MAX_REPLANS",
+    "DEFAULT_MAX_HINTS",
     "SolveSession",
     "SolveStep",
     "get_session",

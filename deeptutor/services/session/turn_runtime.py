@@ -437,6 +437,56 @@ def _extract_persist_user_message(config: dict[str, Any] | None) -> bool:
     return bool(raw)
 
 
+def _resolve_kid_mode() -> bool:
+    """Read the per-user Kid Mode toggle from interface settings.
+
+    Safe to call before the runtime is fully initialized; any failure
+    (missing file, parse error, multi-user path service not yet set)
+    silently falls back to ``False`` so existing turns are unchanged.
+    """
+    try:
+        from deeptutor.services.settings.interface_settings import get_ui_settings
+
+        return bool(get_ui_settings().get("kid_mode", False))
+    except Exception:
+        return False
+
+
+def _resolve_hint_settings() -> tuple[bool, int]:
+    """Read the per-user Hint Mode toggle + max-hints budget.
+
+    Returns ``(hint_mode, max_hints)``. Falls back to ``(False, 3)`` on any
+    error so existing turns are unchanged.
+    """
+    try:
+        from deeptutor.services.settings.interface_settings import get_ui_settings
+
+        ui = get_ui_settings()
+        hint_mode = bool(ui.get("hint_mode", False))
+        try:
+            max_hints = int(ui.get("max_hints", 3))
+        except (TypeError, ValueError):
+            max_hints = 3
+        if max_hints < 1:
+            max_hints = 1
+        elif max_hints > 10:
+            max_hints = 10
+        return hint_mode, max_hints
+    except Exception:
+        return False, 3
+
+
+def _hint_context_kwargs() -> dict[str, Any]:
+    """Resolve hint_mode + max_hints as constructor kwargs for UnifiedContext.
+
+    Returns a dict (``{"hint_mode": bool, "max_hints": int}``) that can be
+    spread into the ``UnifiedContext(...)`` call. Kept as a separate helper
+    so the constructor site stays tidy and the resolution is unit-testable.
+    """
+    hint_mode, max_hints = _resolve_hint_settings()
+    return {"hint_mode": hint_mode, "max_hints": max_hints}
+
+
 def _extract_regenerate_flag(config: dict[str, Any] | None) -> bool:
     if not isinstance(config, dict):
         return False
@@ -1622,6 +1672,14 @@ class TurnRuntimeManager:
                 language=payload.get("language", "en"),
                 memory_context=memory_context,
                 persona_context=persona_context,
+                # Kid Mode is a per-user UI preference (Settings > Appearance),
+                # not a per-turn payload field — read it from interface.json so
+                # every capability (chat, mastery, solve) picks it up uniformly.
+                kid_mode=_resolve_kid_mode(),
+                # Hint Mode is also a per-user UI preference; deterministic
+                # budget enforcement lives in deep_solve (SolveSession) and
+                # mastery_path (PendingQuestion), gated on context.hint_mode.
+                **_hint_context_kwargs(),
                 skills_manifest=skills_manifest,
                 source_manifest=source_manifest_text,
                 metadata={

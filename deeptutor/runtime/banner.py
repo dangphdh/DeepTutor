@@ -129,6 +129,15 @@ LABELS: dict[str, dict[str, str]] = {
         "start.port_kill_failed": "Could not free port {port} (PID {pid}).",
         "start.port_freed": "Port {port} released.",
     },
+    "vi": {
+        # Vietnamese banner — minimal set (render_banner only needs tagline +
+        # lab; the init/start flow reuses English until a full translation
+        # lands, since the LLM responses themselves are already Vietnamese).
+        "tagline": "Gia sư cá nhân hóa, kiến trúc Agent",
+        "lab": "Phòng thí nghiệm Thông tin Dữ liệu @ HKU",
+        "init.mode": "Khởi tạo không gian làm việc",
+        "start.mode": "Khởi động backend + frontend",
+    },
     "zh": {
         "tagline": "智能体原生的个性化辅导",
         "lab": "香港大学数据智能实验室",
@@ -242,6 +251,8 @@ def _pick_language(language: str | None) -> str:
     code = str(language).lower().strip()
     if code in {"zh", "zh-cn", "zh-hans", "chinese", "cn"}:
         return "zh"
+    if code in {"vi", "vietnamese", "tiếng việt", "tieng viet"}:
+        return "vi"
     return "en"
 
 

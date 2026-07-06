@@ -413,9 +413,56 @@ class MasteryGradeTool(BaseTool):
             choice_options=choice_options,
             correct_answer=expected_answer,
         )
-        service.clear_pending_question(progress)
         kp, _, _ = find_knowledge_point(progress, pending.knowledge_point_id)
         mastered = bool(kp and is_mastered(progress, kp))
+        # Hint Mode gate: when the learner is wrong and Hint Mode is on, with-
+        # hold the answer. Keep the pending question alive (don't clear it) so
+        # the same question can be re-posed after a hint; bump the per-question
+        # hint counter and persist it. Only when the budget is exhausted (or
+        # the answer is correct) do we clear and move on.
+        hint_mode = bool(kwargs.get("_hint_mode"))
+        max_hints = int(kwargs.get("_max_hints") or 3)
+        hint_payload: dict[str, Any] = {}
+        if is_correct or not hint_mode:
+            service.clear_pending_question(progress)
+        else:
+            # Wrong under Hint Mode — gate by hint budget.
+            if pending.hints_given < max_hints:
+                pending.hints_given += 1
+                service.set_pending_question(progress, pending)  # persist bumped count
+                hint_payload = {
+                    "hint": {
+                        "n": pending.hints_given,
+                        "max": max_hints,
+                        "exhausted": pending.hints_given >= max_hints,
+                    },
+                    "instruction": (
+                        f"The learner was wrong, but Hint Mode is ON and the "
+                        f"budget is NOT exhausted (hint {pending.hints_given} "
+                        f"of {max_hints} given). DO NOT reveal the answer. "
+                        f"Give hint #{pending.hints_given} — a Socratic nudge "
+                        f"toward the right approach — then POSE THE SAME "
+                        f"QUESTION AGAIN via mastery_quiz (re-register it) and "
+                        f"present it with ask_user. Keep going until the budget "
+                        f"is exhausted or the learner answers correctly."
+                    ),
+                }
+            else:
+                service.clear_pending_question(progress)
+                hint_payload = {
+                    "hint": {
+                        "n": pending.hints_given,
+                        "max": max_hints,
+                        "exhausted": True,
+                    },
+                    "instruction": (
+                        f"Hint budget exhausted ({max_hints} of {max_hints} "
+                        f"given) and the learner is still wrong. Reveal the "
+                        f"full answer now and explain it step by step. This "
+                        f"objective is NOT mastered — keep it in the path for "
+                        f"re-practice."
+                    ),
+                }
         payload = {
             "is_correct": is_correct,
             "knowledge_point_id": pending.knowledge_point_id,
@@ -423,6 +470,7 @@ class MasteryGradeTool(BaseTool):
             "threshold": round(gate_threshold(kp.type), 3) if kp else 0.0,
             "mastered": mastered,
             "next": next_objective(progress).to_dict(),
+            **hint_payload,
         }
         return _json_result(payload, meta_key="mastery_grade")
 

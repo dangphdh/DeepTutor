@@ -1,6 +1,7 @@
 {
   "language.english": "English",
   "language.chinese": "中文",
+  "language.vietnamese": "Vietnamese",
   "Start": "Start",
   "Learn": "Learn",
   "Research": "Research",
@@ -2665,5 +2666,15 @@
   "Connected to LightRAG server": "Connected to LightRAG server",
   "Core {{version}}": "Core {{version}}",
   "API key accepted": "API key accepted",
-  "Open access": "Open access"
+  "Open access": "Open access",
+  "Kid Mode": "Kid Mode",
+  "Kid Mode adapts the tutor's voice for a young child: short sentences, warm encouragement, simple words, and one idea at a time. The mastery bar stays the same — only the voice changes.": "Kid Mode adapts the tutor's voice for a young child: short sentences, warm encouragement, simple words, and one idea at a time. The mastery bar stays the same — only the voice changes.",
+  "Enable": "Enable",
+  "Disable": "Disable",
+  "When on, the tutor speaks to a young child in a warm, simple voice across every capability (chat, mastery, deep solve).": "When on, the tutor speaks to a young child in a warm, simple voice across every capability (chat, mastery, deep solve).",
+  "Hint Mode": "Hint Mode",
+  "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.": "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.",
+  "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.": "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.",
+  "Max hints before revealing the answer": "Max hints before revealing the answer",
+  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "How many hints the tutor gives before showing the full step-by-step answer. Default is 3."
 }

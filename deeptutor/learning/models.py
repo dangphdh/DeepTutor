@@ -180,6 +180,11 @@ class PendingQuestion(BaseModel):
     expected_answer: str = ""
     options: list[str] = Field(default_factory=list)
     created_at: float = Field(default_factory=time.time)
+    # Hint Mode counter for THIS question — bumped each time the learner
+    # answers wrong while Hint Mode is on. Resets whenever a new question is
+    # posed (mastery_quiz writes a fresh PendingQuestion). Persisted so the
+    # count survives across turns (mastery is multi-turn, disk-backed).
+    hints_given: int = 0
 
 
 class LearningProgress(BaseModel):
