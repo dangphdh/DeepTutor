@@ -1,0 +1,42 @@
+{
+  "id": "vn_g2_math",
+  "name": "Toán lớp 2 (VN Grade 2 Math)",
+  "language": "vi",
+  "modules": [
+    {
+      "name": "Số đến 1000",
+      "knowledge_points": [
+        {"name": "Hàng đơn vị, hàng chục, hàng trăm", "type": "concept"},
+        {"name": "Đọc, viết số đến 1000", "type": "procedure"},
+        {"name": "So sánh số đến 1000", "type": "procedure"},
+        {"name": "Sắp xếp số theo thứ tự", "type": "procedure"}
+      ]
+    },
+    {
+      "name": "Cộng và Trừ trong phạm vi 1000",
+      "knowledge_points": [
+        {"name": "Cộng không nhớ trong 1000", "type": "procedure"},
+        {"name": "Cộng có nhớ trong 1000", "type": "procedure"},
+        {"name": "Trừ không nhớ trong 1000", "type": "procedure"},
+        {"name": "Trừ có nhớ trong 1000", "type": "procedure"}
+      ]
+    },
+    {
+      "name": "Bảng cửu chương 2, 5, 10",
+      "knowledge_points": [
+        {"name": "Bảng cửu chương 2", "type": "memory"},
+        {"name": "Bảng cửu chương 5", "type": "memory"},
+        {"name": "Bảng cửu chương 10", "type": "memory"},
+        {"name": "Phép nhân cơ bản", "type": "procedure"}
+      ]
+    },
+    {
+      "name": "Bài toán có lời văn",
+      "knowledge_points": [
+        {"name": "Tóm tắt bài toán bằng sơ đồ", "type": "concept"},
+        {"name": "Bài toán cộng/trừ có lời văn", "type": "procedure"},
+        {"name": "Bài toán nhân có lời văn", "type": "procedure"}
+      ]
+    }
+  ]
+}

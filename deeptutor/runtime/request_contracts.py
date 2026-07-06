@@ -33,6 +33,21 @@ class DeepSolveRequestConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class MasteryRequestConfig(BaseModel):
+    """Per-turn config for the ``mastery_path`` capability.
+
+    Today mastery is config-light: the only public field is ``curriculum``,
+    which names a bundled curriculum id (e.g. ``vn_g2_math``) that
+    ``MasteryPathCapability.run`` pre-seeds before the loop starts. Everything
+    else the engine needs (path id, mastery mode, hint/kid flags) is resolved
+    server-side from metadata and interface settings, not per-turn config.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    curriculum: str = ""
+
+
 class DeepQuestionRequestConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -109,6 +124,12 @@ def validate_deep_solve_request_config(
     return _validate_model(DeepSolveRequestConfig, raw_config, label="deep solve")
 
 
+def validate_mastery_request_config(
+    raw_config: dict[str, Any] | None,
+) -> MasteryRequestConfig:
+    return _validate_model(MasteryRequestConfig, raw_config, label="mastery")
+
+
 def validate_deep_question_request_config(
     raw_config: dict[str, Any] | None,
 ) -> DeepQuestionRequestConfig:
@@ -132,6 +153,7 @@ CAPABILITY_CONFIG_VALIDATORS: dict[str, Callable[[dict[str, Any] | None], Any]] 
     "deep_research": validate_research_request_config,
     "math_animator": validate_math_animator_request_config,
     "visualize": validate_visualize_request_config,
+    "mastery_path": validate_mastery_request_config,
 }
 
 CAPABILITY_REQUEST_SCHEMAS: dict[str, dict[str, Any]] = {
@@ -141,6 +163,7 @@ CAPABILITY_REQUEST_SCHEMAS: dict[str, dict[str, Any]] = {
     "deep_research": build_request_schema(DeepResearchRequestConfig),
     "math_animator": build_request_schema(MathAnimatorRequestConfig),
     "visualize": build_request_schema(VisualizeRequestConfig),
+    "mastery_path": build_request_schema(MasteryRequestConfig),
 }
 
 
@@ -166,6 +189,7 @@ __all__ = [
     "ChatRequestConfig",
     "DeepQuestionRequestConfig",
     "DeepSolveRequestConfig",
+    "MasteryRequestConfig",
     "VisualizeRequestConfig",
     "build_request_schema",
     "get_capability_request_schema",
@@ -173,5 +197,6 @@ __all__ = [
     "validate_chat_request_config",
     "validate_deep_question_request_config",
     "validate_deep_solve_request_config",
+    "validate_mastery_request_config",
     "validate_visualize_request_config",
 ]

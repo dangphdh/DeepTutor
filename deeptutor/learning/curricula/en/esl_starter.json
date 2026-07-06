@@ -1,0 +1,48 @@
+{
+  "id": "esl_starter",
+  "name": "ESL Starter (English for Young Learners)",
+  "language": "en",
+  "modules": [
+    {
+      "name": "Phonics & Sight Words",
+      "knowledge_points": [
+        {"name": "the", "type": "memory"},
+        {"name": "and", "type": "memory"},
+        {"name": "is / are", "type": "memory"},
+        {"name": "was / were", "type": "memory"},
+        {"name": "have / has", "type": "memory"},
+        {"name": "Phonics: -at family (cat, bat, hat)", "type": "memory"},
+        {"name": "Phonics: -ig family (pig, big, dig)", "type": "memory"}
+      ]
+    },
+    {
+      "name": "Simple Grammar",
+      "knowledge_points": [
+        {"name": "Present Simple (I go, she goes)", "type": "concept"},
+        {"name": "Present Continuous (I am going)", "type": "concept"},
+        {"name": "Contrast: Present Simple vs Continuous", "type": "concept"},
+        {"name": "Personal pronouns (I, you, he, she, it, we, they)", "type": "memory"},
+        {"name": "a / an / the (basic articles)", "type": "concept"}
+      ]
+    },
+    {
+      "name": "Vocabulary Themes",
+      "knowledge_points": [
+        {"name": "Animals (cat, dog, bird, fish, rabbit)", "type": "memory"},
+        {"name": "Colors (red, blue, green, yellow)", "type": "memory"},
+        {"name": "Family (mother, father, sister, brother)", "type": "memory"},
+        {"name": "School (book, pencil, teacher, desk)", "type": "memory"},
+        {"name": "Numbers 1-20", "type": "memory"}
+      ]
+    },
+    {
+      "name": "Simple Sentences",
+      "knowledge_points": [
+        {"name": "Greetings (Hello, How are you?)", "type": "procedure"},
+        {"name": "Introductions (My name is...)", "type": "procedure"},
+        {"name": "Likes / dislikes (I like...)", "type": "procedure"},
+        {"name": "Asking questions (What, Where, Who)", "type": "procedure"}
+      ]
+    }
+  ]
+}
