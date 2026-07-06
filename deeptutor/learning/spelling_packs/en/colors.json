@@ -1,0 +1,14 @@
+{
+  "name": "Colors",
+  "language": "en",
+  "words": [
+    {"word": "red", "example_sentence": "The apple is red."},
+    {"word": "blue", "example_sentence": "The sky is blue."},
+    {"word": "green", "example_sentence": "The grass is green."},
+    {"word": "yellow", "example_sentence": "The sun is yellow."},
+    {"word": "purple", "example_sentence": "The flower is purple."},
+    {"word": "orange", "example_sentence": "The orange is sweet."},
+    {"word": "black", "example_sentence": "The cat is black."},
+    {"word": "white", "example_sentence": "The cloud is white."}
+  ]
+}

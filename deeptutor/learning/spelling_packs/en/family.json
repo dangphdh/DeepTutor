@@ -1,0 +1,14 @@
+{
+  "name": "Family",
+  "language": "en",
+  "words": [
+    {"word": "mother", "example_sentence": "My mother is kind."},
+    {"word": "father", "example_sentence": "My father is tall."},
+    {"word": "sister", "example_sentence": "My sister is funny."},
+    {"word": "brother", "example_sentence": "My brother likes football."},
+    {"word": "baby", "example_sentence": "The baby is cute."},
+    {"word": "family", "example_sentence": "I love my family."},
+    {"word": "grandma", "example_sentence": "Grandma tells stories."},
+    {"word": "grandpa", "example_sentence": "Grandpa reads the news."}
+  ]
+}

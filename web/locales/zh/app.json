@@ -2676,5 +2676,17 @@
   "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.": "开启后，导师会给出苏格拉底式提示而不是直接给出答案，在深度解题和掌握路径中有确定的提示预算。提示预算用完后，会展示完整答案。在普通聊天中仅为强提示指令。",
   "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.": "引导学习者思考。适用于深度解题、掌握路径和聊天。",
   "Max hints before revealing the answer": "揭示答案前的最大提示次数",
-  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "导师在展示完整分步答案前给出的提示次数。默认为 3。"
+  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "导师在展示完整分步答案前给出的提示次数。默认为 3。",
+  "Spelling": "拼写",
+  "Manage spelling word lists. Curated packs ship ready to use; create custom lists for this week's words. Practice via mastery_path with the Spelling topic.": "管理拼写单词表。预置包可直接使用；为本周的单词创建自定义列表。通过 mastery_path 的拼写主题进行练习。",
+  "Curated Packs": "预置包",
+  "Ready-to-use word packs for young ESL learners. Read-only — create a custom list to add your own words.": "为低龄 ESL 学习者准备的即用单词包。只读 — 创建自定义列表来添加你自己的单词。",
+  "No curated packs available.": "没有可用的预置包。",
+  "Copy name to use in mastery_path": "复制名称以在 mastery_path 中使用",
+  "Custom Lists": "自定义列表",
+  "Your own word lists. Use these in mastery_path by their name or id.": "你自己的单词列表。在 mastery_path 中通过名称或 id 使用。",
+  "List name (e.g. This Week's Words)": "列表名称（例如：本周单词）",
+  "Words, separated by commas (cat, dog, bird)": "单词，用逗号分隔（cat, dog, bird）",
+  "No custom lists yet. Create one above.": "还没有自定义列表。在上方创建一个。",
+  "Listen": "听"
 }

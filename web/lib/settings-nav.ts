@@ -18,6 +18,7 @@ import {
   Plug,
   Search,
   SlidersHorizontal,
+  SpellCheck,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -283,6 +284,16 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
     },
     icon: BrainCircuit,
     href: "/settings/memory",
+  },
+  {
+    key: "spelling",
+    label: { zh: "拼写", en: "Spelling" },
+    blurb: {
+      zh: "拼写单词表与练习包",
+      en: "Spelling word lists and practice packs",
+    },
+    icon: SpellCheck,
+    href: "/settings/spelling",
   },
 ];
 

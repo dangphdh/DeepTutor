@@ -1,0 +1,16 @@
+{
+  "name": "Sight Words (Starter)",
+  "language": "en",
+  "words": [
+    {"word": "the", "example_sentence": "The cat is soft."},
+    {"word": "and", "example_sentence": "I have a pen and a book."},
+    {"word": "is", "example_sentence": "She is my friend."},
+    {"word": "it", "example_sentence": "It is a sunny day."},
+    {"word": "you", "example_sentence": "You are kind."},
+    {"word": "he", "example_sentence": "He likes to play."},
+    {"word": "she", "example_sentence": "She reads a book."},
+    {"word": "was", "example_sentence": "I was happy."},
+    {"word": "for", "example_sentence": "This gift is for you."},
+    {"word": "are", "example_sentence": "We are friends."}
+  ]
+}

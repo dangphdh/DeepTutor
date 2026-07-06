@@ -44,5 +44,21 @@
   "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.": "Khi bật, gia sư sẽ đưa ra gợi ý theo phương pháp Socratic thay vì đáp án, với ngân sách xác định trong giải sâu và đường dẫn thành thạo. Khi hết ngân sách gợi ý, đáp án đầy đủ sẽ được tiết lộ. Trong trò chuyện thông thường chỉ là chỉ thị prompt mạnh.",
   "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.": "Hướng dẫn người học tư duy. Hoạt động trong giải sâu, đường dẫn thành thạo và trò chuyện.",
   "Max hints before revealing the answer": "Số gợi ý tối đa trước khi tiết lộ đáp án",
-  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "Số lần gia sư đưa ra gợi ý trước khi trình bày đáp án đầy đủ từng bước. Mặc định là 3."
+  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "Số lần gia sư đưa ra gợi ý trước khi trình bày đáp án đầy đủ từng bước. Mặc định là 3.",
+  "Spelling": "Chính tả",
+  "Manage spelling word lists. Curated packs ship ready to use; create custom lists for this week's words. Practice via mastery_path with the Spelling topic.": "Quản lý danh sách từ vựng chính tả. Các gói có sẵn dùng được ngay; tạo danh sách riêng cho từ tuần này. Luyện tập qua mastery_path với chủ đề Chính tả.",
+  "Curated Packs": "Gói có sẵn",
+  "Ready-to-use word packs for young ESL learners. Read-only — create a custom list to add your own words.": "Các gói từ vựng sẵn dùng cho bé học ESL. Chỉ đọc — tạo danh sách riêng để thêm từ của bạn.",
+  "No curated packs available.": "Không có gói nào.",
+  "words": "từ",
+  "Copy name to use in mastery_path": "Sao chép tên để dùng trong mastery_path",
+  "Custom Lists": "Danh sách riêng",
+  "Your own word lists. Use these in mastery_path by their name or id.": "Danh sách từ của bạn. Dùng trong mastery_path qua tên hoặc id.",
+  "List name (e.g. This Week's Words)": "Tên danh sách (vd: Từ tuần này)",
+  "Create": "Tạo",
+  "Words, separated by commas (cat, dog, bird)": "Các từ, cách nhau bởi dấu phẩy (cat, dog, bird)",
+  "No custom lists yet. Create one above.": "Chưa có danh sách nào. Tạo ở trên.",
+  "Delete": "Xóa",
+  "Listen": "Nghe",
+  "Loading...": "Đang tải..."
 }

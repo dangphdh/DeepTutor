@@ -332,6 +332,7 @@ from deeptutor.api.routers import (
     system,
     unified_ws,
     voice,
+    wordlists,
 )
 from deeptutor.api.routers import (
     tools as tools_router,
@@ -413,6 +414,9 @@ app.include_router(
 )
 app.include_router(
     personas.router, prefix="/api/v1/personas", tags=["personas"], dependencies=_auth
+)
+app.include_router(
+    wordlists.router, prefix="/api/v1/wordlists", tags=["wordlists"], dependencies=_auth
 )
 app.include_router(tools_router.router, prefix="/api/v1/tools", tags=["tools"], dependencies=_auth)
 app.include_router(system.router, prefix="/api/v1/system", tags=["system"], dependencies=_auth)

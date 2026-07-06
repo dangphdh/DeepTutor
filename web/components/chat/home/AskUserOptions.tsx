@@ -9,6 +9,7 @@ import {
   shouldAppendEventContent,
 } from "@/lib/stream";
 import type { StreamEvent } from "@/lib/unified-ws";
+import { useTTSPlayback } from "@/hooks/useTTSPlayback";
 
 /**
  * v3 ``ask_user`` payload. Mirrors ``deeptutor.tools.ask_user.AskUserPayload``.
@@ -707,6 +708,7 @@ const QuestionBody = memo(function QuestionBody({
 }) {
   const { t } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const tts = useTTSPlayback();
 
   useEffect(() => {
     if (customSelected) {
@@ -716,12 +718,37 @@ const QuestionBody = memo(function QuestionBody({
 
   return (
     <>
-      <div className="mt-3 text-[14px] font-medium leading-snug text-[var(--foreground)]">
-        {question.prompt}
-        {question.multi_select ? (
-          <span className="ml-1.5 text-[11px] font-normal text-[var(--muted-foreground)]">
-            {t("Select all that apply.")}
-          </span>
+      <div className="mt-3 flex items-start gap-2 text-[14px] font-medium leading-snug text-[var(--foreground)]">
+        <div className="flex-1">
+          {question.prompt}
+          {question.multi_select ? (
+            <span className="ml-1.5 text-[11px] font-normal text-[var(--muted-foreground)]">
+              {t("Select all that apply.")}
+            </span>
+          ) : null}
+        </div>
+        {/* Speaker button: speaks the question prompt via TTS. Especially
+            useful for spelling practice (re-hear the word) and for young
+            learners who benefit from audio reinforcement. */}
+        {question.prompt ? (
+          <button
+            type="button"
+            onClick={() => tts.play(question.prompt)}
+            disabled={tts.loading || tts.playing || locked}
+            title={t("Listen")}
+            aria-label={t("Listen")}
+            className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--muted)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {tts.loading ? (
+              <span className="text-[12px]">…</span>
+            ) : tts.playing ? (
+              <span className="text-[12px]">♪</span>
+            ) : (
+              <span aria-hidden className="text-[14px]">
+                🔊
+              </span>
+            )}
+          </button>
         ) : null}
       </div>
 

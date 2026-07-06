@@ -1,0 +1,14 @@
+{
+  "name": "School",
+  "language": "en",
+  "words": [
+    {"word": "book", "example_sentence": "I read a book."},
+    {"word": "pencil", "example_sentence": "I write with a pencil."},
+    {"word": "teacher", "example_sentence": "The teacher is nice."},
+    {"word": "desk", "example_sentence": "My desk is clean."},
+    {"word": "read", "example_sentence": "I can read."},
+    {"word": "write", "example_sentence": "I can write my name."},
+    {"word": "friend", "example_sentence": "She is my friend."},
+    {"word": "school", "example_sentence": "I go to school."}
+  ]
+}

@@ -2676,5 +2676,17 @@
   "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.": "When on, the tutor gives Socratic hints instead of the answer, with a deterministic budget in deep_solve and mastery_path. After the hint budget runs out, the full answer is revealed. In plain chat it is a strong prompt directive only.",
   "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.": "Coaches the learner to think. Works in deep_solve, mastery_path, and chat.",
   "Max hints before revealing the answer": "Max hints before revealing the answer",
-  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "How many hints the tutor gives before showing the full step-by-step answer. Default is 3."
+  "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.": "How many hints the tutor gives before showing the full step-by-step answer. Default is 3.",
+  "Spelling": "Spelling",
+  "Manage spelling word lists. Curated packs ship ready to use; create custom lists for this week's words. Practice via mastery_path with the Spelling topic.": "Manage spelling word lists. Curated packs ship ready to use; create custom lists for this week's words. Practice via mastery_path with the Spelling topic.",
+  "Curated Packs": "Curated Packs",
+  "Ready-to-use word packs for young ESL learners. Read-only — create a custom list to add your own words.": "Ready-to-use word packs for young ESL learners. Read-only — create a custom list to add your own words.",
+  "No curated packs available.": "No curated packs available.",
+  "Copy name to use in mastery_path": "Copy name to use in mastery_path",
+  "Custom Lists": "Custom Lists",
+  "Your own word lists. Use these in mastery_path by their name or id.": "Your own word lists. Use these in mastery_path by their name or id.",
+  "List name (e.g. This Week's Words)": "List name (e.g. This Week's Words)",
+  "Words, separated by commas (cat, dog, bird)": "Words, separated by commas (cat, dog, bird)",
+  "No custom lists yet. Create one above.": "No custom lists yet. Create one above.",
+  "Listen": "Listen"
 }

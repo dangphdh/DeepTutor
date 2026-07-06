@@ -64,7 +64,7 @@ MASTERY_TOOL_NAMES: tuple[str, ...] = (
     "mastery_build",
 )
 
-_QUESTION_TYPES = ("choice", "short", "open")
+_QUESTION_TYPES = ("choice", "short", "open", "spelling")
 _ALLOWED_KP_TYPES = {t.value for t in KnowledgeType}
 logger = logging.getLogger(__name__)
 
@@ -252,7 +252,12 @@ class MasteryQuizTool(BaseTool):
                     type="string",
                     description=(
                         "'choice' (exact match), 'short' (exact / fuzzy for ≤30 "
-                        "chars), or 'open' (keyword overlap). Default 'short'."
+                        "chars), 'open' (keyword overlap), or 'spelling' "
+                        "(exact match, case-insensitive — for spelling practice "
+                        "where every letter must be right). Default 'short'. "
+                        "For spelling: the tutor speaks the word via TTS and the "
+                        "learner types it; on a wrong answer a character-level "
+                        "diff hint is returned automatically."
                     ),
                     required=False,
                     default="short",
@@ -472,6 +477,13 @@ class MasteryGradeTool(BaseTool):
             "next": next_objective(progress).to_dict(),
             **hint_payload,
         }
+        # Spelling-specific: surface a character-level diff hint so the model
+        # can give targeted feedback ("you missed the letter 'l'") instead of
+        # just "wrong". Independent of Hint Mode — always helpful for spelling.
+        if not is_correct and pending.question_type == "spelling" and answer:
+            from deeptutor.learning.grading import spelling_diff
+
+            payload["spelling_diff"] = spelling_diff(answer, expected_answer)
         return _json_result(payload, meta_key="mastery_grade")
 
 
@@ -559,7 +571,12 @@ class MasteryBuildTool(BaseTool):
                 "here. Each knowledge point needs a 'type': memory (facts), "
                 "procedure (step-by-step skills), concept (ideas to understand), "
                 "or design (open-ended judgement). Use mode='replace' to start "
-                "fresh or 'append' to add to an existing path."
+                "fresh or 'append' to add to an existing path. "
+                "For SPELLING practice: build a module whose knowledge points are "
+                "the words to learn (type='memory', name=the word). Then quiz each "
+                "with mastery_quiz using question_type='spelling' and "
+                "expected_answer=the word — the tutor speaks the word via TTS and "
+                "the learner types it; wrong answers get a character-level diff hint."
             ),
             parameters=[
                 ToolParameter(

@@ -1,0 +1,14 @@
+{
+  "name": "Animals",
+  "language": "en",
+  "words": [
+    {"word": "cat", "example_sentence": "The cat is sleeping."},
+    {"word": "dog", "example_sentence": "My dog likes to run."},
+    {"word": "bird", "example_sentence": "The bird can fly."},
+    {"word": "fish", "example_sentence": "The fish swims in water."},
+    {"word": "rabbit", "example_sentence": "The rabbit has long ears."},
+    {"word": "elephant", "example_sentence": "The elephant is big."},
+    {"word": "lion", "example_sentence": "The lion is strong."},
+    {"word": "monkey", "example_sentence": "The monkey climbs trees."}
+  ]
+}
