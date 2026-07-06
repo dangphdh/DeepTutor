@@ -64,7 +64,7 @@ MASTERY_TOOL_NAMES: tuple[str, ...] = (
     "mastery_build",
 )
 
-_QUESTION_TYPES = ("choice", "short", "open", "spelling")
+_QUESTION_TYPES = ("choice", "short", "open", "spelling", "pronunciation")
 _ALLOWED_KP_TYPES = {t.value for t in KnowledgeType}
 logger = logging.getLogger(__name__)
 
@@ -252,12 +252,17 @@ class MasteryQuizTool(BaseTool):
                     type="string",
                     description=(
                         "'choice' (exact match), 'short' (exact / fuzzy for ≤30 "
-                        "chars), 'open' (keyword overlap), or 'spelling' "
+                        "chars), 'open' (keyword overlap), 'spelling' "
                         "(exact match, case-insensitive — for spelling practice "
-                        "where every letter must be right). Default 'short'. "
-                        "For spelling: the tutor speaks the word via TTS and the "
-                        "learner types it; on a wrong answer a character-level "
-                        "diff hint is returned automatically."
+                        "where every letter must be right), or 'pronunciation' "
+                        "(lenient phonetic match — the learner SPEAKS the word "
+                        "into the mic, STT transcribes it, and grading forgives "
+                        "natural approximations like 'skool' for 'school'). "
+                        "Default 'short'. For spelling/pronunciation: the tutor "
+                        "speaks the word via TTS; for spelling the learner types "
+                        "it, for pronunciation the learner says it into the mic. "
+                        "On a wrong answer, a diff hint (spelling_diff or "
+                        "pronunciation_diff) is returned automatically."
                     ),
                     required=False,
                     default="short",
@@ -484,6 +489,14 @@ class MasteryGradeTool(BaseTool):
             from deeptutor.learning.grading import spelling_diff
 
             payload["spelling_diff"] = spelling_diff(answer, expected_answer)
+        # Pronunciation-specific: surface what the tutor heard vs the target so
+        # the model can give encouraging spoken feedback ("you said 'skool' —
+        # very close! The word is 'school'"). The transcript is the STT output
+        # the learner just submitted as their answer.
+        if not is_correct and pending.question_type == "pronunciation" and answer:
+            from deeptutor.learning.grading import pronunciation_diff
+
+            payload["pronunciation_diff"] = pronunciation_diff(answer, expected_answer)
         return _json_result(payload, meta_key="mastery_grade")
 
 

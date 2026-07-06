@@ -10,6 +10,7 @@ import {
 } from "@/lib/stream";
 import type { StreamEvent } from "@/lib/unified-ws";
 import { useTTSPlayback } from "@/hooks/useTTSPlayback";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 
 /**
  * v3 ``ask_user`` payload. Mirrors ``deeptutor.tools.ask_user.AskUserPayload``.
@@ -706,9 +707,17 @@ const QuestionBody = memo(function QuestionBody({
   onSelectCustom: () => void;
   onCustomTextChange: (text: string) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const tts = useTTSPlayback();
+  // Mic: speech-to-text. On transcript, reveal the free-text area and fill it
+  // with the heard text — the transcript becomes the submitted answer, graded
+  // leniently (for pronunciation questions) or exactly (for spelling). Pinned
+  // to the UI language so STT targets the right phoneme space.
+  const recorder = useVoiceRecorder((text) => {
+    onSelectCustom();
+    onCustomTextChange(text);
+  }, i18n.language);
 
   useEffect(() => {
     if (customSelected) {
@@ -749,6 +758,36 @@ const QuestionBody = memo(function QuestionBody({
               </span>
             )}
           </button>
+        ) : null}
+        {/* Mic button: speech-to-text. Especially useful for pronunciation
+            practice (the learner says the word, STT transcribes it into the
+            text field) and for accessibility. Available on any free-text
+            question; the transcript is graded leniently for pronunciation
+            question_type, exactly for spelling. */}
+        {question.allow_free_text ? (
+          <button
+            type="button"
+            onClick={() => recorder.toggle()}
+            disabled={locked || recorder.state === "transcribing"}
+            title={t("Speak")}
+            aria-label={t("Speak")}
+            className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+              recorder.state === "recording"
+                ? "animate-pulse bg-red-500/15 text-red-500"
+                : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+            }`}
+          >
+            {recorder.state === "transcribing" ? (
+              <span className="text-[12px]">…</span>
+            ) : (
+              <span aria-hidden className="text-[14px]">
+                🎤
+              </span>
+            )}
+          </button>
+        ) : null}
+        {recorder.error ? (
+          <span className="mt-1 text-[10.5px] text-red-500/80">{recorder.error}</span>
         ) : null}
       </div>
 

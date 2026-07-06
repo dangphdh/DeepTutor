@@ -10,8 +10,15 @@ export type RecorderState = "idle" | "recording" | "transcribing";
  * Microphone capture → backend transcription. Records via MediaRecorder, posts
  * the clip to ``/api/v1/voice/stt`` (which uses the admin-configured STT
  * provider), and hands the transcript back through ``onTranscript``.
+ *
+ * ``language`` optionally pins recognition to a locale (BCP-47 like "en",
+ * "vi") — forwarded as the ``language`` form field. The pronunciation trainer
+ * passes the learner's UI language so STT targets the right phoneme space.
  */
-export function useVoiceRecorder(onTranscript: (text: string) => void) {
+export function useVoiceRecorder(
+  onTranscript: (text: string) => void,
+  language?: string,
+) {
   const [state, setState] = useState<RecorderState>("idle");
   const [error, setError] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -19,6 +26,8 @@ export function useVoiceRecorder(onTranscript: (text: string) => void) {
   const streamRef = useRef<MediaStream | null>(null);
   const onTranscriptRef = useRef(onTranscript);
   onTranscriptRef.current = onTranscript;
+  const languageRef = useRef(language);
+  languageRef.current = language;
 
   const releaseStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -67,6 +76,9 @@ export function useVoiceRecorder(onTranscript: (text: string) => void) {
             : "webm";
         const form = new FormData();
         form.append("file", blob, `recording.${ext}`);
+        if (languageRef.current) {
+          form.append("language", languageRef.current);
+        }
         const resp = await apiFetch(apiUrl("/api/v1/voice/stt"), {
           method: "POST",
           body: form,
