@@ -37,6 +37,11 @@ deeptutor run deep_research "Attention mechanisms" --kb papers --config mode=rep
 deeptutor run visualize "Plot the unit circle"
 deeptutor run math_animator "Visualize a Fourier series"
 
+# Young-learner features (see "Young-Learner Features" section below)
+deeptutor run mastery_path "Toán" -l vi --config curriculum=vn_g2_math        # VN Grade 2 math
+deeptutor run mastery_path "English" -l vi --config curriculum=esl_starter    # ESL starter
+deeptutor run mastery_path "Spelling practice" -l vi                          # spelling + pronunciation
+
 # Capabilities accepted by `run` / `chat -c`:
 #   chat, deep_solve, deep_question, deep_research, visualize, math_animator, mastery_path
 
@@ -151,6 +156,56 @@ deeptutor serve [--host 0.0.0.0] [--port 8001] [--reload]   # Start the API serv
 deeptutor start [--home <path>]                     # Launch backend + frontend together
 deeptutor init [--cli] [--home <path>]              # Create/update workspace settings
 ```
+
+### Young-Learner Features
+
+DeepTutor ships five features aimed at young children (e.g. a 7-year-old learning math and ESL). They stack: the tutor can speak **Vietnamese**, in a warm **Kid Mode** voice, give **Socratic hints** instead of answers, and run **spelling/pronunciation** drills on a spaced-repetition ladder driven by a vetted **curriculum**.
+
+**Toggles** (per-user, in `data/user/settings/interface.json` or Settings → Appearance in the Web UI):
+- `language: "vi"` — first-class Vietnamese (alongside `en`, `zh`).
+- `kid_mode: true` — short sentences, praise, one idea at a time. The mastery bar stays firm; only the voice changes.
+- `hint_mode: true` + `max_hints: 3` — Socratic coaching with a deterministic budget in `deep_solve` and `mastery_path`.
+
+```bash
+# Curricula drive mastery_path along a vetted scope-and-sequence
+# (bundled: vn_g2_math, esl_starter). Re-running resumes where the learner left off.
+deeptutor run mastery_path "Toán" -l vi --config curriculum=vn_g2_math
+deeptutor run mastery_path "English" -l vi --config curriculum=esl_starter
+
+# Spelling + pronunciation practice with a curated pack or custom word list
+deeptutor run mastery_path "Spelling practice" -l vi
+```
+
+**Curricula** — bundled JSON under `deeptutor/learning/curricula/{en,vi}/`, loaded via `importlib.resources`. Two ship:
+- `vn_g2_math` (vi, 4 modules / 15 KPs): Số đến 1000 → Cộng/Sub 1000 → Bảng cửu chương 2/5/10 → Bài toán có lời văn.
+- `esl_starter` (en, 4 modules / 21 KPs): Phonics & Sight Words → Simple Grammar → Vocabulary Themes → Simple Sentences.
+
+```bash
+# List / inspect curricula (read-only)
+curl localhost:8001/api/v1/curricula?language=vi
+curl localhost:8001/api/v1/curricula/vn_g2_math?language=vi
+```
+
+**Word lists** — `mastery_path` spelling/pronunciation question types (`question_type="spelling"` / `"pronunciation"`). Curated packs ship under `deeptutor/learning/spelling_packs/en/` (animals, colors, family, school, sight_words — 42 words total). Custom lists live under `workspace/learning/wordlists/` and are managed via REST:
+
+```bash
+# List curated packs + the user's custom word lists
+curl localhost:8001/api/v1/wordlists
+# Create a custom list
+curl -X POST localhost:8001/api/v1/wordlists \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"This Week","language":"en","words":["school","teacher","friend"]}'
+# Add words to an existing custom list
+curl -X POST localhost:8001/api/v1/wordlists/this_week/words \
+  -H 'Content-Type: application/json' \
+  -d '{"words":["book","pencil"]}'
+# Remove a word
+curl -X DELETE localhost:8001/api/v1/wordlists/this_week/words/pencil
+# Delete a custom list
+curl -X DELETE localhost:8001/api/v1/wordlists/this_week
+```
+
+**Voice** — the ask_user card exposes a 🔊 speaker (TTS, `/api/v1/voice/tts`) and a 🎤 mic (STT, `/api/v1/voice/stt`) for any free-text question. Configure TTS + STT in Settings → Models. The mic sends the UI language so STT targets the right phoneme space.
 
 ## REPL Slash Commands
 

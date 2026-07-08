@@ -176,8 +176,42 @@ DeepTutor is an agent-native learning workspace that connects tutoring, problem 
 - **Multi-engine knowledge** — versioned RAG libraries across LlamaIndex, PageIndex, GraphRAG, LightRAG, or a linked Obsidian vault, with pluggable document parsing.
 - **Extensible tools and skills** — built-in tools, MCP servers, image / video / voice generation models, and installable community skills from EduHub.
 - **Inspectable memory** — L1 traces, L2 surface summaries, and L3 synthesis make personalization visible and editable, with a Memory Graph that traces every claim back to its evidence.
+- **Young-learner friendly** — Vietnamese (`vi`) is a first-class language alongside English and Chinese; **Kid Mode** reshapes the tutor's voice for a young child (short sentences, warm encouragement, one idea at a time); **Hint Mode** gives Socratic hints instead of the answer (with a deterministic budget in `deep_solve` and `mastery_path`); a **Spelling Trainer** and **Pronunciation Check** ride on `mastery_path` with TTS read-aloud (🔊) and STT mic input (🎤); bundled **curricula** (Vietnamese Grade 2 math, ESL starter) drive `mastery_path` along a vetted scope-and-sequence.
 
 ---
+
+<details>
+<summary><b>👨‍👩‍👧 Using DeepTutor with a young child</b> · Kid Mode, Hint Mode, Spelling, Pronunciation, Curricula</summary>
+
+DeepTutor doubles as a daily learning companion for a young child (e.g. a 7-year-old learning math and English as a second language). Five features work together:
+
+| Feature | What it does | Where to enable |
+|:---|:---|:---|
+| **Vietnamese** | The tutor speaks Vietnamese natively (prompts + voice + UI). | Settings → Appearance → Language → **Tiếng Việt**, or `--language vi` |
+| **Kid Mode** | Warm, simple voice: short sentences, praise ("Giỏi quá!"), one idea per turn. The mastery bar stays firm — only the voice changes. | Settings → Appearance → **Kid Mode** toggle |
+| **Hint Mode** | Socratic coaching: gives one hint at a time instead of the answer. Deterministic budget in `deep_solve` and `mastery_path` (default 3 hints, then reveals the full answer). | Settings → Appearance → **Hint Mode** toggle + max hints |
+| **Spelling Trainer** | Speaks a word 🔊, the child types it, gets a character-level hint on misses ("you're missing the letter 'l'"), re-quizzed on a spaced-repetition ladder. Curated packs ship ready to use. | Settings → **Spelling** |
+| **Pronunciation Check** | The child says the word 🎤, STT transcribes it, lenient grading forgives natural approximations ("skool" for "school"). | Mic button on any free-text question (configure STT in Settings → Models) |
+
+**Curricula** drive `mastery_path` along a vetted scope-and-sequence instead of inventing objectives ad hoc. Two ship bundled:
+
+```bash
+# Vietnamese Grade 2 math (Số đến 1000 → Cộng/Sub 1000 → Bảng cửu chương → Bài toán có lời)
+deeptutor run mastery_path "Toán" -l vi --config curriculum=vn_g2_math
+
+# ESL starter (Phonics & Sight Words → Simple Grammar → Vocabulary → Simple Sentences)
+deeptutor run mastery_path "English" -l vi --config curriculum=esl_starter
+
+# Spelling / pronunciation practice with a curated pack (animals, colors, family, school, sight_words)
+deeptutor run mastery_path "Spelling practice" -l vi
+```
+
+Re-running the same command resumes exactly where the learner left off (progress is keyed by `curriculum_<id>`). See **Settings → Spelling** in the Web UI to activate packs or add custom word lists.
+
+</details>
+
+---
+
 
 ## 🚀 Get Started
 

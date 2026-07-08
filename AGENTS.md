@@ -136,3 +136,37 @@ Source extras (.[ extra ], defined in pyproject.toml):
 .[dev]            — Test / lint tooling
 .[all]            — Everything above
 ```
+
+## Young-Learner Subsystem
+
+Five first-class features that work together to make DeepTutor a daily
+companion for a young child (e.g. a 7-year-old learning math + ESL). They are
+all *additive* — none rewrites an existing seam, and each composes with the
+mastery gate, spaced repetition, and the chat agent loop.
+
+| Feature | Mechanism | Key files |
+| ------- | --------- | --------- |
+| **Vietnamese (`vi`)** | First-class language code: `parse_language()` recognizes `vi`, the prompt manager falls back `vi → en`, the language directive forces Vietnamese output. (Pre-existing bug: unknown codes defaulted to `zh` — fixed to `en`.) | `services/config/loader.py`, `services/prompt/{language,manager}.py`, `agents/chat/prompts/vi/`, `capabilities/{mastery,solve}/prompts/vi/`, `web/locales/vi/` |
+| **Kid Mode** | Per-user toggle persisted in `interface.json`. `UnifiedContext.kid_mode` → a `kid_mode` prompt block injected in `ChatPromptAssembler.blocks()` *after* capability playbooks, so it overrides tone without touching procedure. The mastery gate stays hard — Kid Mode changes the VOICE, never the bar. | `core/context.py`, `services/session/turn_runtime.py`, `agents/chat/prompt_blocks.py`, `api/routers/settings.py` (`PUT /kid-mode`) |
+| **Hint Mode** | Two-layer, matching the codebase axiom "intelligence at the loop's exit; deterministic spine through tools". Soft: a `hint_mode` prompt block. Hard: `SolveSession.hints_given/max_hints/give_hint()` mirrors `solve_replan`'s budget, gating `solve_finish_step`'s "write the final answer" instruction; `PendingQuestion.hints_given` gates `mastery_grade`'s reveal. | `capabilities/solve/{session,tools,loop}.py`, `capabilities/mastery/{tools,loop}.py`, `learning/models.py`, `agents/chat/prompt_blocks.py`, `api/routers/settings.py` (`PUT /hint-mode`) |
+| **Spelling Trainer** | New `question_type="spelling"` in `grade_answer()` — exact char-match (a 1-char-off spelling is wrong). A `spelling_diff()` helper produces targeted hints via `SequenceMatcher.get_opcodes()` ("you're missing the letter 'l'"). Bundled curated packs + `WordListStore` (JSON-backed, mirrors `LearningStore`) for custom lists. | `learning/{grading,wordlist_store}.py`, `learning/spelling_packs/`, `capabilities/mastery/tools.py`, `api/routers/wordlists.py` (`/api/v1/wordlists`) |
+| **Pronunciation Check** | New `question_type="pronunciation"` with lenient grading via normalized Levenshtein distance ("skool"→"school" passes; "dog"→"cat" fails). A `pronunciation_diff()` helper surfaces "you said 'skool', the word is 'school'". The frontend 🔊/🎤 buttons reuse `useTTSPlayback` + `useVoiceRecorder` (the recorder now forwards the UI language to STT). | `learning/grading.py`, `capabilities/mastery/tools.py`, `web/hooks/useVoiceRecorder.ts`, `web/components/chat/home/AskUserOptions.tsx` |
+| **Curriculum YAML** | Vetted scope-and-sequence JSON under `learning/curricula/{en,vi}/`, loaded via `importlib.resources`. `MasteryPathCapability.run()` *pre-seeds* the path before the loop starts (path_id `curriculum_<id>`), so the model's first `mastery_status` returns `active` and it never enters the "design a path" branch. Idempotent + resumable. Picked via `MasteryRequestConfig.curriculum` (per-turn config: `--config curriculum=...`). | `learning/curricula/`, `capabilities/mastery/capability.py`, `runtime/request_contracts.py`, `api/routers/curricula.py` (`/api/v1/curricula`) |
+
+**Design axioms in play** (consistent with the rest of the architecture):
+
+- *Intelligence lives at the loop's exit; the deterministic spine is engine
+  state read/written through tools.* Hint Mode's budget and the mastery gate
+  both embody this — the model teaches/questions, the engine decides
+  advancement and answer-reveal.
+- *Kid Mode changes the voice, never the bar.* A `PromptBlock` stacked above
+  capability playbooks reshapes tone; it cannot override safety, tool
+  truthfulness, or the mastery gate.
+- *Spelling/pronunciation ride on mastery_path, not a new capability.* They
+  are question types on `MEMORY` knowledge points, reusing `PendingQuestion`,
+  `grade_and_record`, and the `SpacedRepetitionScheduler`
+  (`[0,1,3,7,14,30,60]` day ladder for `MEMORY`).
+- *Curricula remove the model from authoring the scope-and-sequence.* The
+  pre-seed runs deterministically in `capability.run()`; the model teaches in
+  order, the engine drives progression.
+
